@@ -59,8 +59,6 @@ function SpaceDraw2d () {
         highY = Math.floor(bounds.y.high / unit) * unit;
 
         i = -bounds.x.low * bounds.scale;
-        j = -bounds.y.low * bounds.scale;
-
         if (i < 0) {
             drawMethod = this.drawYAxisLeftOff;
         } else if (i < this.margin) {
@@ -73,15 +71,27 @@ function SpaceDraw2d () {
             drawMethod = this.drawYAxisRightOff;
         }
         drawMethod.apply(this, [context, bounds]);
+
+        j = -bounds.y.low * bounds.scale;
+        if (j < 0) {
+            drawMethod = this.drawXAxisTopOff;
+        } else if (j < this.margin) {
+            drawMethod = this.drawXAxisTopTransition;
+        } else if (j < this.space.height - this.margin) {
+            drawMethod = this.drawXAxisMiddle;
+        } else if (j < this.space.height) {
+            drawMethod = this.drawXAxisBottomTransition;
+        } else {
+            drawMethod = this.drawXAxisBottomOff;
+        }
+        drawMethod.apply(this, [context, bounds]);
+
     };
 
-    proto.drawYAxisLeftOff = function (context, bounds) {
-
-    };
-
-    proto.drawYAxisLeftTransition = function (context, bounds) {
-
-    };
+    proto.drawYAxisLeftOff = function (context, bounds) {};
+    proto.drawYAxisLeftTransition = function (context, bounds) {};
+    proto.drawYAxisRightTransition = function (context, bounds) {};
+    proto.drawYAxisRightOff = function (context, bounds) {};
 
     proto.drawYAxisMiddle = function (context, bounds) {
         this.strokeYAxis(context, bounds);
@@ -89,12 +99,16 @@ function SpaceDraw2d () {
                           -bounds.x.low * bounds.scale);
     };
 
-    proto.drawYAxisRightTransition = function (context, bounds) {
 
-    };
+    proto.drawXAxisTopOff = function (context, bounds) {};
+    proto.drawXAxisTopTransition = function (context, bounds) {};
+    proto.drawXAxisBottomTransition= function (context, bounds) {};
+    proto.drawXAxisBottomOff = function (context, bounds) {};
 
-    proto.drawYAxisRightOff = function (context, bounds) {
-
+    proto.drawXAxisMiddle = function (context, bounds) {
+        this.strokeXAxis(context, bounds);
+        this.placeXLabels(context, bounds,
+                          -bounds.y.low * bounds.scale);
     };
 
     proto.strokeYAxis = function (context, bounds) {
@@ -115,6 +129,24 @@ function SpaceDraw2d () {
         context.restore();
     };
 
+    proto.strokeXAxis = function (context, bounds) {
+        var i;
+
+        context.save();
+
+        context.strokeStyle = "#000";
+        context.lineWidth = 4;
+
+        j = -bounds.y.low * bounds.scale;
+        context.beginPath();
+        context.moveTo(0, j);
+        context.lineTo(this.space.width, j);
+
+        context.stroke();
+
+        context.restore();
+    };
+
     proto.placeYLabels = function (context, bounds, i) {
         var self = this;
         var i, offset;
@@ -128,6 +160,25 @@ function SpaceDraw2d () {
             var coord;
 
             coord = self.coordToText(y, bounds.unit, true);
+            context.fillText(coord, i + offset, j - offset);
+        });
+
+        context.restore();
+    };
+
+    proto.placeXLabels = function (context, bounds, j) {
+        var self = this;
+        var i, offset;
+
+        context.save();
+
+        context.font = "25px arial";
+        offset = 5;
+
+        this.eachXUnit(bounds, function (i, x) {
+            var coord;
+
+            coord = self.coordToText(x, bounds.unit, true);
             context.fillText(coord, i + offset, j - offset);
         });
 
