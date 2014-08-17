@@ -13,14 +13,16 @@
       var canvas, space, spaceDraw;
       canvas = document.getElementsByClassName('main')[0];
       space = new Space(canvas);
+      space.start();
       spaceDraw = new SpaceDraw2d(space);
 
       tick();
-
       function tick () {
-          space.tick();
-          spaceDraw.draw();
-          //requestAnimationFrame(tick);
+          if (space.shouldRedraw) {
+              spaceDraw.draw();
+          }
+          space.clearFlags();
+          requestAnimationFrame(tick);
       }
 
     </script>

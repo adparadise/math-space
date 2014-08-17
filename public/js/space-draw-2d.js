@@ -12,8 +12,13 @@ function SpaceDraw2d () {
     };
 
     proto.draw = function () {
+        this.clear(this.context, this.space);
         this.drawGridlines(this.context, this.space);
         this.drawAxes(this.context, this.space);
+    };
+
+    proto.clear = function (context, space) {
+        context.clearRect(0, 0, space.width, space.height);
     };
 
     proto.drawGridlines = function (context, space) {
@@ -86,7 +91,6 @@ function SpaceDraw2d () {
             drawMethod = this.drawXAxisBottomOff;
         }
         drawMethod.apply(this, [context, space]);
-
     };
 
     proto.drawYAxisLeftOff = function (context, space) {};
@@ -212,7 +216,7 @@ function SpaceDraw2d () {
         lowX = Math.ceil(bounds.x.low / unit) * unit;
         highX = Math.floor(bounds.x.high / unit) * unit;
 
-        for (x = lowX; x < highX; x += unit) {
+        for (x = lowX - unit; x <= highX; x += unit) {
             i = (x - bounds.x.low) * bounds.scale;
             callback(i, x);
         }
@@ -227,7 +231,7 @@ function SpaceDraw2d () {
         lowY = Math.ceil(bounds.y.low / unit) * unit;
         highY = Math.floor(bounds.y.high / unit) * unit;
 
-        for (y = lowY; y < highY; y += unit) {
+        for (y = lowY - unit; y <= highY + unit; y += unit) {
             j = (y - bounds.y.low) * bounds.scale;
             callback(j, y);
         }
