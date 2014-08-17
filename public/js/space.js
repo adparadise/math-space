@@ -14,6 +14,9 @@ function Space () {
         this.mousedown = this.mousedown.bind(this);
         this.mousemove = this.mousemove.bind(this);
         this.mouseup = this.mouseup.bind(this);
+        this.touchstart = this.touchstart.bind(this);
+        this.touchmove = this.touchmove.bind(this);
+        this.touchend = this.touchend.bind(this);
     };
 
     proto.start = function () {
@@ -21,36 +24,46 @@ function Space () {
     };
 
     proto.bakeDims = function () {
+        this.width = this.canvas.getAttribute('width');
+        this.height = this.canvas.getAttribute('height');
+
+        this.calculateScale();
+
+        this.shouldRedraw = true;
+    };
+
+    proto.calculateScale = function () {
         var style, transform;
         var matrixPattern, match;
         var scaleX, scaleY;
-
-        this.width = this.canvas.getAttribute('width');
-        this.height = this.canvas.getAttribute('height');
 
         scaleX = 1;
         scaleY = 1;
         style = window.getComputedStyle(this.canvas);
         transform = style.getPropertyValue('transform');
-        matrixPattern = /matrix\(([^,]+), ([^,]+), ([^,]+), ([^,]+), ([^,]+), ([0-9\.]+)/;
-        match = matrixPattern.exec(transform);
-        if (match) {
-            scaleX = match[1];
-            scaleY = match[4];
+        if (transform) {
+            matrixPattern = /matrix\(([^,]+), ([^,]+), ([^,]+), ([^,]+), ([^,]+), ([0-9\.]+)/;
+            match = matrixPattern.exec(transform);
+            if (match) {
+                scaleX = match[1];
+                scaleY = match[4];
+            }
         }
 
         this.scale = {
             x: (this.width / this.canvas.clientWidth) * scaleX,
             y: (this.height / this.canvas.clientHeight) * scaleY
         };
-
-        this.shouldRedraw = true;
-    };
+    }
 
     proto.bindEvents = function () {
         this.canvas.addEventListener('mousedown', this.mousedown);
         this.canvas.addEventListener('mousemove', this.mousemove);
         this.canvas.addEventListener('mouseup', this.mouseup);
+
+        this.canvas.addEventListener('touchstart', this.touchstart);
+        this.canvas.addEventListener('touchmove', this.touchmove);
+        this.canvas.addEventListener('touchend', this.touchend);
     };
 
     proto.tick = function () {
@@ -88,11 +101,19 @@ function Space () {
     };
 
     proto.mousedown = function (event) {
+        this.dragstart(event.x, event.y);
+    };
+
+    proto.touchstart = function (event) {
+        this.dragstart(event.touches[0].clientX, event.touches[0].clientY);
+    };
+
+    proto.dragstart = function (x, y) {
         this.isDragging = true;
         this.drag = {
             initial: {
-                x: event.x,
-                y: event.y
+                x: x,
+                y: y
             },
             scale: this.bounds.scale,
             camera: {
@@ -105,19 +126,33 @@ function Space () {
     };
 
     proto.mousemove = function (event) {
+        this.dragmove(event.x, event.y);
+    };
+
+    proto.touchmove = function (event) {
+        event.preventDefault();
+        this.dragmove(event.touches[0].clientX,
+                      event.touches[0].clientY);
+    };
+
+    proto.dragmove = function (x, y) {
         var scaleX, scaleY;
         if (!this.isDragging) {
             return;
         }
         scaleX = this.drag.scale * this.scale.x;
         scaleY = this.drag.scale * this.scale.y;
-        this.setCurrentCamera(this.drag.camera.x + (this.drag.initial.x - event.x) / scaleX,
-                              this.drag.camera.y + (this.drag.initial.y - event.y) / scaleY,
+        this.setCurrentCamera(this.drag.camera.x + (this.drag.initial.x - x) / scaleX,
+                              this.drag.camera.y + (this.drag.initial.y - y) / scaleY,
                               this.drag.camera.rangeX,
                               this.drag.camera.rangeY);
     };
 
     proto.mouseup = function (event) {
+        this.isDragging = false;
+    };
+
+    proto.touchend = function (event) {
         this.isDragging = false;
     };
 }(Space.prototype));
