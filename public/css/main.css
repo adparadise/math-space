@@ -1,0 +1,13 @@
+
+
+.space {
+    width: 500px;
+    height: 500px;
+    border: 3px solid black;
+    position: relative;
+}
+
+.space canvas {
+    transform-origin: left top;
+    transform: scale(0.5,0.5);
+}

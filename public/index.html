@@ -1,9 +1,12 @@
 <?doctype html>
 <html>
   <head>
+    <link rel="stylesheet" href="css/main.css"/>
   </head>
   <body>
-    <canvas class="main"></canvas>
+    <div class="space">
+      <canvas class="main" width="1000" height="1000"></canvas>
+    </div>
     <script src="js/space.js"></script>
     <script src="js/space-draw-2d.js"></script>
     <script>
@@ -17,7 +20,7 @@
       function tick () {
           space.tick();
           spaceDraw.draw();
-          requestAnimationFrame(tick);
+          //requestAnimationFrame(tick);
       }
 
     </script>
