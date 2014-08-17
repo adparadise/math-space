@@ -10,7 +10,7 @@ function Space () {
         this.canvas = canvas;
         this.bakeDims();
 
-        this.setCurrentCamera(0, 0, 1, 1);
+        this.setCurrentCamera(-0.5, -0.5, 1, 1);
     };
 
     proto.bakeDims = function () {
@@ -32,12 +32,12 @@ function Space () {
             unit: 0.1,
             scale: 1000,
             x: {
-                low: 0,
-                high: 1
+                low: -0.5,
+                high: 0.5
             },
             y: {
-                low: 0,
-                high: 1
+                low: -0.5,
+                high: 0.5
             }
         };
     };
