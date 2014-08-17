@@ -1,0 +1,25 @@
+<?doctype html>
+<html>
+  <head>
+  </head>
+  <body>
+    <canvas class="main"></canvas>
+    <script src="js/space.js"></script>
+    <script src="js/space-draw-2d.js"></script>
+    <script>
+      var canvas, space, spaceDraw;
+      canvas = document.getElementsByClassName('main')[0];
+      space = new Space(canvas);
+      spaceDraw = new SpaceDraw2d(space);
+
+      tick();
+
+      function tick () {
+          space.tick();
+          spaceDraw.draw();
+          requestAnimationFrame(tick);
+      }
+
+    </script>
+  </body>
+</html>
