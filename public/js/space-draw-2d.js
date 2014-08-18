@@ -94,8 +94,7 @@ function SpaceDraw2d () {
 
     proto.drawYAxisMiddle = function (context, space) {
         this.strokeYAxis(context, space);
-        this.placeYLabels(context, space,
-                          -space.bounds.x.low * space.bounds.scale);
+        this.placeYLabels(context, space, -space.bounds.x.low * space.bounds.scale);
     };
 
     proto.drawYAxisRight = function (context, space) {
@@ -104,19 +103,17 @@ function SpaceDraw2d () {
     };
 
     proto.drawXAxisTop = function (context, space) {
-        this.placeXLabels(context, space,
-                          this.margin.y);
+        this.strokeYAxis(context, space);
+        this.placeXLabels(context, space, this.margin.y);
     };
 
     proto.drawXAxisMiddle = function (context, space) {
         this.strokeXAxis(context, space);
-        this.placeXLabels(context, space,
-                          -space.bounds.y.low * space.bounds.scale);
+        this.placeXLabels(context, space, -space.bounds.y.low * space.bounds.scale);
     };
 
     proto.drawXAxisBottom = function (context, space) {
-        this.placeXLabels(context, space,
-                          space.height);
+        this.placeXLabels(context, space, space.height);
     };
 
     proto.strokeYAxis = function (context, space) {
@@ -219,7 +216,7 @@ function SpaceDraw2d () {
         lowX = Math.ceil(bounds.x.low / unit) * unit;
         highX = Math.floor(bounds.x.high / unit) * unit;
 
-        for (x = lowX - unit; x <= highX; x += unit) {
+        for (x = highX + unit; x >= lowX - unit; x -= unit) {
             i = (x - bounds.x.low) * bounds.scale;
             callback(i, x);
         }
@@ -234,7 +231,7 @@ function SpaceDraw2d () {
         lowY = Math.ceil(bounds.y.low / unit) * unit;
         highY = Math.floor(bounds.y.high / unit) * unit;
 
-        for (y = lowY - unit; y <= highY + unit; y += unit) {
+        for (y = highY + unit; y >= lowY - unit; y -= unit) {
             j = (y - bounds.y.low) * bounds.scale;
             callback(j, y);
         }
