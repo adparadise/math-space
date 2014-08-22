@@ -79,7 +79,7 @@ function Space () {
     };
 
     proto.setCurrentCamera = function (x, y, rangeX, rangeY) {
-        var range, scale;
+        var range, scale, rangeLog, unit;
         this.camera = {
             x: x,
             y: y,
@@ -90,7 +90,7 @@ function Space () {
         range = Math.min(rangeX, rangeY);
         scale = this.minDim / range;
         this.bounds = {
-            unit: 0.1,
+            range: range,
             scale: scale,
             x: {
                 low: x - range / 2,

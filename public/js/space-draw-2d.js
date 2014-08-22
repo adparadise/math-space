@@ -25,6 +25,14 @@ function SpaceDraw2d () {
     };
 
     proto.drawGridlines = function (context, space) {
+        var rangeLog, unit, opacity;
+
+        rangeLog = Math.round(Math.log(space.bounds.range) / Math.log(10));
+        unit = Math.pow(10, rangeLog - 1);
+        this.drawUnitGridlines(context, space, unit);
+    };
+
+    proto.drawUnitGridlines = function (context, space, unit, opacity) {
         var bounds;
 
         bounds = this.space.bounds;
@@ -35,13 +43,13 @@ function SpaceDraw2d () {
 
         context.beginPath();
 
-        this.eachXUnit(space, function (i, x) {
+        this.eachXUnit(space, unit, function (i, x) {
             i = (x - bounds.x.low) * bounds.scale;
             context.moveTo(i, 0);
             context.lineTo(i, space.height);
         });
 
-        this.eachYUnit(space, function(j, y) {
+        this.eachYUnit(space, unit, function(j, y) {
             j = (y - bounds.y.low) * bounds.scale;
             context.moveTo(0, j);
             context.lineTo(space.width, j);
@@ -53,14 +61,23 @@ function SpaceDraw2d () {
     };
 
     proto.drawAxes = function (context, space) {
-        var unit, bounds;
+        var rangeLog, unit, opacity;
+
+        rangeLog = Math.round(Math.log(space.bounds.range) / Math.log(10));
+        unit = Math.pow(10, rangeLog - 1);
+        this.drawUnitAxes(context, space, space.bounds.unit);
+    };
+
+    proto.drawUnitAxes = function (context, space, unit, opacity) {
+        var rangeLog, unit, bounds;
         var lowX, highX;
         var lowY, highY;
         var i, j;
         var drawMethod;
 
         bounds = space.bounds;
-        unit = bounds.unit;
+        rangeLog = Math.round(Math.log(space.bounds.range) / Math.log(10));
+        unit = Math.pow(10, rangeLog - 1);
 
         lowX = Math.ceil(bounds.x.low / unit) * unit;
         highX = Math.floor(bounds.x.high / unit) * unit;
@@ -75,7 +92,7 @@ function SpaceDraw2d () {
         } else {
             drawMethod = this.drawYAxisRight;
         }
-        drawMethod.apply(this, [context, space]);
+        drawMethod.apply(this, [context, space, unit]);
 
         j = -bounds.y.low * bounds.scale;
         if (j < this.margin.y) {
@@ -85,35 +102,35 @@ function SpaceDraw2d () {
         } else {
             drawMethod = this.drawXAxisBottom;
         }
-        drawMethod.apply(this, [context, space]);
+        drawMethod.apply(this, [context, space, unit]);
     };
 
-    proto.drawYAxisLeft = function (context, space) {
-        this.placeYLabels(context, space, 0);
+    proto.drawYAxisLeft = function (context, space, unit) {
+        this.placeYLabels(context, space, unit, 0);
     };
 
-    proto.drawYAxisMiddle = function (context, space) {
+    proto.drawYAxisMiddle = function (context, space, unit) {
         this.strokeYAxis(context, space);
-        this.placeYLabels(context, space, -space.bounds.x.low * space.bounds.scale);
+        this.placeYLabels(context, space, unit, -space.bounds.x.low * space.bounds.scale);
     };
 
-    proto.drawYAxisRight = function (context, space) {
+    proto.drawYAxisRight = function (context, space, unit) {
         this.strokeYAxis(context, space);
-        this.placeYLabels(context, space, space.width - this.margin.x);
+        this.placeYLabels(context, space, unit, space.width - this.margin.x);
     };
 
-    proto.drawXAxisTop = function (context, space) {
+    proto.drawXAxisTop = function (context, space, unit) {
         this.strokeYAxis(context, space);
-        this.placeXLabels(context, space, this.margin.y);
+        this.placeXLabels(context, space, unit, this.margin.y);
     };
 
-    proto.drawXAxisMiddle = function (context, space) {
+    proto.drawXAxisMiddle = function (context, space, unit) {
         this.strokeXAxis(context, space);
-        this.placeXLabels(context, space, -space.bounds.y.low * space.bounds.scale);
+        this.placeXLabels(context, space, unit, -space.bounds.y.low * space.bounds.scale);
     };
 
-    proto.drawXAxisBottom = function (context, space) {
-        this.placeXLabels(context, space, space.height);
+    proto.drawXAxisBottom = function (context, space, unit) {
+        this.placeXLabels(context, space, unit, space.height);
     };
 
     proto.strokeYAxis = function (context, space) {
@@ -154,9 +171,9 @@ function SpaceDraw2d () {
         context.restore();
     };
 
-    proto.placeYLabels = function (context, space, i) {
+    proto.placeYLabels = function (context, space, unit, i) {
         var self = this;
-        var bounds, i, offset;
+        var bounds, offset;
 
         bounds = space.bounds;
         context.save();
@@ -164,19 +181,19 @@ function SpaceDraw2d () {
         context.font = "25px arial";
         offset = 5;
 
-        this.eachYUnit(space, function (j, y) {
+        this.eachYUnit(space, unit, function (j, y) {
             var coord;
 
-            coord = self.coordToText(y, bounds.unit, true);
+            coord = self.coordToText(y, unit, true);
             context.fillText(coord, i + offset, j - offset);
         });
 
         context.restore();
     };
 
-    proto.placeXLabels = function (context, space, j) {
+    proto.placeXLabels = function (context, space, unit, j) {
         var self = this;
-        var bounds, i, offset;
+        var bounds, offset;
         bounds = space.bounds;
 
         context.save();
@@ -184,10 +201,10 @@ function SpaceDraw2d () {
         context.font = "25px arial";
         offset = 5;
 
-        this.eachXUnit(space, function (i, x) {
+        this.eachXUnit(space, unit, function (i, x) {
             var coord;
 
-            coord = self.coordToText(x, bounds.unit, true);
+            coord = self.coordToText(x, unit, true);
             context.fillText(coord, i + offset, j - offset);
         });
 
@@ -197,7 +214,7 @@ function SpaceDraw2d () {
     proto.coordToText = function (u, unit, isBlankAtOrigin) {
         var coord, places;
 
-        places = 1;
+        places = -Math.floor(Math.log(unit) / Math.log(10));
         coord = u.toFixed(places);
         coord = '' + coord;
         if (coord[0] !== '-') {
@@ -207,11 +224,10 @@ function SpaceDraw2d () {
         return coord;
     };
 
-    proto.eachXUnit = function (space, callback) {
-        var bounds, unit, x, i;
+    proto.eachXUnit = function (space, unit, callback) {
+        var bounds, x, i;
 
         bounds = space.bounds;
-        unit = bounds.unit;
 
         lowX = Math.ceil(bounds.x.low / unit) * unit;
         highX = Math.floor(bounds.x.high / unit) * unit;
@@ -222,11 +238,10 @@ function SpaceDraw2d () {
         }
     };
 
-    proto.eachYUnit = function (space, callback) {
-        var unit, bounds, y, j;
+    proto.eachYUnit = function (space, unit, callback) {
+        var bounds, y, j;
 
         bounds = space.bounds;
-        unit = bounds.unit;
 
         lowY = Math.ceil(bounds.y.low / unit) * unit;
         highY = Math.floor(bounds.y.high / unit) * unit;
