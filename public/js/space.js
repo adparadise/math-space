@@ -26,6 +26,7 @@ function Space () {
     proto.bakeDims = function () {
         this.width = this.canvas.getAttribute('width');
         this.height = this.canvas.getAttribute('height');
+        this.minDim = Math.min(this.width, this.height);
 
         this.calculateScale();
 
@@ -67,7 +68,10 @@ function Space () {
     };
 
     proto.tick = function () {
-
+        this.setCurrentCamera(this.camera.x, this.camera.y,
+                              this.camera.rangeX * 0.999,
+                              this.camera.rangeY * 0.999);
+        this.shouldRedraw = true;
     };
 
     proto.clearFlags = function () {
@@ -75,7 +79,7 @@ function Space () {
     };
 
     proto.setCurrentCamera = function (x, y, rangeX, rangeY) {
-        var range;
+        var range, scale;
         this.camera = {
             x: x,
             y: y,
@@ -83,10 +87,11 @@ function Space () {
             rangeY: rangeY
         };
 
-        range = 1;
+        range = Math.min(rangeX, rangeY);
+        scale = this.minDim / range;
         this.bounds = {
             unit: 0.1,
-            scale: 1000,
+            scale: scale,
             x: {
                 low: x - range / 2,
                 high: x + range / 2
