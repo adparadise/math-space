@@ -10,7 +10,7 @@ function SpaceDraw2d () {
         this.context = space.canvas.getContext('2d');
         this.margin = {
             x: 50,
-            y: 25
+            y: 0
         };
     };
 
@@ -70,8 +70,6 @@ function SpaceDraw2d () {
 
     proto.drawUnitAxes = function (context, space, unit, opacity) {
         var rangeLog, unit, bounds;
-        var lowX, highX;
-        var lowY, highY;
         var i, j;
         var drawMethod;
 
@@ -79,58 +77,42 @@ function SpaceDraw2d () {
         rangeLog = Math.round(Math.log(space.bounds.range) / Math.log(10));
         unit = Math.pow(10, rangeLog - 1);
 
-        lowX = Math.ceil(bounds.x.low / unit) * unit;
-        highX = Math.floor(bounds.x.high / unit) * unit;
-        lowY = Math.ceil(bounds.y.low / unit) * unit;
-        highY = Math.floor(bounds.y.high / unit) * unit;
+        this.drawYAxis(context, space, unit);
+        this.drawXAxis(context, space, unit);
+    };
+
+    proto.drawYAxis = function (context, space, unit) {
+        var bounds, i, labelPos;
+
+        bounds = space.bounds;
 
         i = -bounds.x.low * bounds.scale;
         if (i < 0) {
-            drawMethod = this.drawYAxisLeft;
+            labelPos = 0;
         } else if (i < this.space.width - this.margin.x) {
-            drawMethod = this.drawYAxisMiddle;
+            labelPos = i;
         } else {
-            drawMethod = this.drawYAxisRight;
+            labelPos = space.width - this.margin.x;
         }
-        drawMethod.apply(this, [context, space, unit]);
+        this.strokeYAxis(context, space);
+        this.placeYLabels(context, space, unit, labelPos);
+    }
 
+    proto.drawXAxis = function (context, space, unit) {
+        var bounds, j, labelPos;
+
+        bounds = space.bounds;
         j = -bounds.y.low * bounds.scale;
         if (j < this.margin.y) {
-            drawMethod = this.drawXAxisTop;
+            labelPos = this.margin.y;
         } else if (j < this.space.height) {
-            drawMethod = this.drawXAxisMiddle;
+            labelPos = j;
         } else {
-            drawMethod = this.drawXAxisBottom;
+            labelPos = space.height;
         }
-        drawMethod.apply(this, [context, space, unit]);
-    };
 
-    proto.drawYAxisLeft = function (context, space, unit) {
-        this.placeYLabels(context, space, unit, 0);
-    };
-
-    proto.drawYAxisMiddle = function (context, space, unit) {
-        this.strokeYAxis(context, space);
-        this.placeYLabels(context, space, unit, -space.bounds.x.low * space.bounds.scale);
-    };
-
-    proto.drawYAxisRight = function (context, space, unit) {
-        this.strokeYAxis(context, space);
-        this.placeYLabels(context, space, unit, space.width - this.margin.x);
-    };
-
-    proto.drawXAxisTop = function (context, space, unit) {
-        this.strokeYAxis(context, space);
-        this.placeXLabels(context, space, unit, this.margin.y);
-    };
-
-    proto.drawXAxisMiddle = function (context, space, unit) {
         this.strokeXAxis(context, space);
-        this.placeXLabels(context, space, unit, -space.bounds.y.low * space.bounds.scale);
-    };
-
-    proto.drawXAxisBottom = function (context, space, unit) {
-        this.placeXLabels(context, space, unit, space.height);
+        this.placeXLabels(context, space, unit, labelPos);
     };
 
     proto.strokeYAxis = function (context, space) {
@@ -192,6 +174,15 @@ function SpaceDraw2d () {
     };
 
     proto.placeXLabels = function (context, space, unit, j) {
+        var labelMethod;
+        labelMethod = this.placeXLabelsHorizontally;
+        if (unit < 0.01 || unit > 100) {
+            labelMethod = this.placeXLabelsVertically;
+        }
+        labelMethod.apply(this, [context, space, unit, j]);
+    };
+
+    proto.placeXLabelsHorizontally = function (context, space, unit, j) {
         var self = this;
         var bounds, offset;
         bounds = space.bounds;
@@ -206,6 +197,27 @@ function SpaceDraw2d () {
 
             coord = self.coordToText(x, unit, true);
             context.fillText(coord, i + offset, j - offset);
+        });
+
+        context.restore();
+    };
+
+    proto.placeXLabelsVertically = function (context, space, unit, j) {
+        var self = this;
+        var bounds, offset;
+        bounds = space.bounds;
+
+        context.save();
+
+        context.font = "25px arial";
+        offset = 5;
+        context.rotate(Math.PI / 2);
+
+        this.eachXUnit(space, unit, function (i, x) {
+            var coord;
+
+            coord = self.coordToText(x, unit, true);
+            context.fillText(coord, j + offset, -offset - i);
         });
 
         context.restore();

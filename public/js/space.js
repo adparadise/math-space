@@ -145,12 +145,12 @@ function Space () {
         if (!this.isDragging) {
             return;
         }
-        scaleX = this.drag.scale * this.scale.x;
-        scaleY = this.drag.scale * this.scale.y;
+        scaleX = this.bounds.scale * this.scale.x;
+        scaleY = this.bounds.scale * this.scale.y;
         this.setCurrentCamera(this.drag.camera.x + (this.drag.initial.x - x) / scaleX,
                               this.drag.camera.y + (this.drag.initial.y - y) / scaleY,
-                              this.drag.camera.rangeX,
-                              this.drag.camera.rangeY);
+                              this.camera.rangeX,
+                              this.camera.rangeY);
     };
 
     proto.mouseup = function (event) {
