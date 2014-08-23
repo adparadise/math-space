@@ -5,17 +5,29 @@
     <meta name="viewport" content="width=device-width, user-scalable=no">
   </head>
   <body>
-    <div class="space">
-      <canvas class="main" width="1000" height="1000"></canvas>
-    </div>
+    <canvas class="main" width="1000" height="1000"></canvas>
+    <div class="slides"></div>
+
     <script src="js/space.js"></script>
     <script src="js/space-draw-2d.js"></script>
+    <script src="js/slides.js"></script>
+    <script src="js/slide-definition.js"></script>
     <script>
       var canvas, space, spaceDraw;
+
       canvas = document.getElementsByClassName('main')[0];
       space = new Space(canvas);
       space.start();
       spaceDraw = new SpaceDraw2d(space);
+
+      var slideElement, slides, definitions;
+
+      definitions = [new SlideDefinition()];
+      slides = new Slides(definitions);
+      slideElement = document.getElementsByClassName('slides')[0];
+      slides.setContainer(slideElement);
+
+      slides.transitionToSlide(0);
 
       tick();
       function tick () {
@@ -24,6 +36,9 @@
               spaceDraw.draw();
           }
           space.clearFlags();
+
+          slides.tick();
+
           requestAnimationFrame(tick);
       }
 
