@@ -9,7 +9,7 @@ function Space () {
     proto.initialize = function (canvas) {
         this.canvas = canvas;
         this.bakeDims();
-        this.setCurrentCamera(0, 0, 1, 1);
+        this.setCurrentCamera(0.5, 0.5, 1.1, 1.1);
 
         this.mousedown = this.mousedown.bind(this);
         this.mousemove = this.mousemove.bind(this);
@@ -33,6 +33,8 @@ function Space () {
         this.shouldRedraw = true;
     };
 
+    // Account for additional scaling done with CSS which might alter
+    // screen pixels per canvas pixel.
     proto.calculateScale = function () {
         var style, transform;
         var matrixPattern, match;
@@ -68,10 +70,7 @@ function Space () {
     };
 
     proto.tick = function () {
-        this.setCurrentCamera(this.camera.x, this.camera.y,
-                              this.camera.rangeX * 0.999,
-                              this.camera.rangeY * 0.999);
-        this.shouldRedraw = true;
+
     };
 
     proto.clearFlags = function () {
@@ -80,6 +79,7 @@ function Space () {
 
     proto.setCurrentCamera = function (x, y, rangeX, rangeY) {
         var range, scale, rangeLog, unit;
+        var paddingX, paddingY;
         this.camera = {
             x: x,
             y: y,
@@ -89,16 +89,18 @@ function Space () {
 
         range = Math.min(rangeX, rangeY);
         scale = this.minDim / range;
+        paddingX = (this.width - range * scale) / scale;
+        paddingY = (this.height - range * scale) / scale;
         this.bounds = {
             range: range,
             scale: scale,
             x: {
-                low: x - range / 2,
-                high: x + range / 2
+                low: x - range / 2 - paddingX / 2,
+                high: x + range / 2 + paddingX / 2
             },
             y: {
-                low: y - range / 2,
-                high: y + range / 2
+                low: y - range / 2 - paddingY / 2,
+                high: y + range / 2 + paddingY / 2
             }
         };
 
