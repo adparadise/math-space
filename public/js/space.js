@@ -1,6 +1,10 @@
 
 
-
+/**
+ * This class serves as the translation layer between the
+ * HTML/Canvas/CSS on the page and the more idealized coordinate space
+ * it represents.
+ */
 function Space () {
     this.initialize.apply(this, arguments);
 }
