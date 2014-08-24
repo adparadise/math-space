@@ -24,10 +24,23 @@ function SlideDefinition () {
         this.element = element;
         this.isBound = true;
         this.element.setAttribute('class', 'slide');
+        this.createMainContent();
+    };
+
+    proto.createMainContent = function () {
+        this.element.innerHTML = [
+            '<h1>Welcome</h1>',
+        ].join('\n');
     };
 
     proto.setTransition = function (percent) {
-        this.element.setAttribute('style', 'opacity: ' + percent.toFixed(20));
+        var opacity;
+        opacity = percent.toFixed(20);
+        if (opacity) {
+            this.element.setAttribute('style', 'opacity: ' + opactity);
+        } else {
+            this.element.deleteAttribute('style');
+        }
     };
 
     // Declare this slide in focus, so that it is interactive.

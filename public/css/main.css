@@ -8,23 +8,24 @@
 }
 
 canvas.main {
-    transform-origin: left top;
-    -webkit-transform-origin: left top;
-    transform: scale(0.5, 0.5);
-    -webkit-transform: scale(0.5, 0.5);
+    width: 500px;
+    height: 500px;
 }
 
 .slides {
+    display: flex;
     position: absolute;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
-    background: #fe5;
+    background: #fe3;
+    -webkit-flex-direction: column;
 }
 
 .slides .slide {
-    position: relative;
-    width: 100%;
-    height: 100%;
+    -webkit-flex: 1 1 40%;
+    margin: 10% 10%;
 }
+
+
