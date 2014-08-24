@@ -5,7 +5,7 @@ var SlideReader = require('../lib/slide-reader');
 describe('SlideReader', function () {
     describe('readFromString', function () {
 
-        it('should read', function (done) {
+        it('should read the text per section', function (done) {
             var reader, contents;
             reader = new SlideReader();
 
@@ -19,7 +19,7 @@ describe('SlideReader', function () {
 
             function callback (error, slide) {
                 assert.equal(error, undefined);
-                assert.equal(slide.getContentBlock('Main'), '\n# Welcome\n');
+                assert.equal(slide.getContentBlock('Main'), '<h1>Welcome</h1>');
                 done();
             }
         });
