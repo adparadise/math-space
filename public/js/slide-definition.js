@@ -37,7 +37,7 @@ function SlideDefinition () {
         var opacity;
         opacity = percent.toFixed(20);
         if (opacity) {
-            this.element.setAttribute('style', 'opacity: ' + opactity);
+            this.element.setAttribute('style', 'opacity: ' + opacity);
         } else {
             this.element.deleteAttribute('style');
         }
