@@ -15,7 +15,12 @@ function SlideDefinition () {
     // Expand the static, content-managed definition into executable
     // form.
     proto.build = function (definition) {
-
+        this.content = definition.content;
+        try {
+            this.data = JSON.parse(definition.javaScript);
+        } catch (e) {
+            this.error = e;
+        }
     };
 
     // Pair this executable definition with a DOM element while the
@@ -28,9 +33,7 @@ function SlideDefinition () {
     };
 
     proto.createMainContent = function () {
-        this.element.innerHTML = [
-            '<h1>Welcome</h1>',
-        ].join('\n');
+        this.element.innerHTML = this.content.Main;
     };
 
     proto.setTransition = function (percent) {
@@ -56,7 +59,6 @@ function SlideDefinition () {
     // Unbind events and clear any references to the dom, freeing this
     // definition for future reuse.
     proto.release = function () {
-
         delete this.isBound;
     };
 }(SlideDefinition.prototype));

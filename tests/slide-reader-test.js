@@ -65,4 +65,20 @@ describe('SlideReader', function () {
             }
         });
     });
+
+    describe('readDeck', function () {
+        it.only('should', function (done) {
+            var reader;
+
+            reader = new SlideReader();
+            reader.readDeck('slides/01-ratios', deckCallback);
+
+            function deckCallback (error, definitions) {
+                assert.equal(error, undefined);
+                assert.notEqual(definitions[0], undefined);
+                assert.notEqual(definitions[0].content, undefined);
+                done();
+            };
+        });
+    });
 });

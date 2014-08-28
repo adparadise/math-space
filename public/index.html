@@ -15,6 +15,7 @@
     <script src="js/space-draw-2d.js"></script>
     <script src="js/slides.js"></script>
     <script src="js/slide-definition.js"></script>
+    <script src="js/slide-loader.js"></script>
     <script>
       var canvas, space, spaceDraw;
 
@@ -23,14 +24,21 @@
       space.start();
       spaceDraw = new SpaceDraw2d(space);
 
-      var slideElement, slides, definitions;
+      var slideLoader, slides;
 
-      definitions = [new SlideDefinition()];
-      slides = new Slides(definitions);
-      slideElement = document.getElementsByClassName('slides')[0];
-      slides.setContainer(slideElement);
+      slideLoader = new SlideLoader();
+      slideLoader.getSlides('01-ratios', function (error, slides) {
+          var slideElement;
+          if (error) {
+              console.log(error);
+              return;
+          }
+          slideElement = document.getElementsByClassName('slides')[0];
+          slides.setContainer(slideElement);
 
-      slides.transitionToSlide(0);
+          slides.transitionToSlide(0);
+      });
+
 
       tick();
       function tick () {
@@ -40,7 +48,7 @@
           }
           space.clearFlags();
 
-          slides.tick();
+          slides && slides.tick();
 
           requestAnimationFrame(tick);
       }
