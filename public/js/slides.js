@@ -15,8 +15,8 @@ function Slides () {
     };
 
     // Assign the DOM element that will contain these slides.
-    proto.setContainer = function (container) {
-        this.container = container;
+    proto.setSlideElements = function (slideElements) {
+        this.slideElements = slideElements;
     };
 
     // Request that we transition to a specific slide.
@@ -128,12 +128,12 @@ function Slides () {
             current: 0
         };
         this.slideStates[slideNumber] = slideState;
-        this.container.appendChild(slideState.element);
+        this.slideElements.main.appendChild(slideState.element);
     }
 
     proto.cleanUp = function (slideState) {
         slideState.definition.release();
-        this.container.removeChild(slideState.element);
+        this.slideElements.main.removeChild(slideState.element);
     };
 
     proto.updateSlideDisplay = function (slideState) {

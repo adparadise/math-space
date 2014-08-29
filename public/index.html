@@ -16,43 +16,12 @@
     <script src="js/slides.js"></script>
     <script src="js/slide-definition.js"></script>
     <script src="js/slide-loader.js"></script>
+    <script src="js/main-view.js"></script>
     <script>
-      var canvas, space, spaceDraw;
+      var mainView;
 
-      canvas = document.getElementsByClassName('main')[0];
-      space = new Space(canvas);
-      space.start();
-      spaceDraw = new SpaceDraw2d(space);
-
-      var slideLoader, slides;
-
-      slideLoader = new SlideLoader();
-      slideLoader.getSlides('01-ratios', function (error, slides) {
-          var slideElement;
-          if (error) {
-              console.log(error);
-              return;
-          }
-          slideElement = document.getElementsByClassName('slides')[0];
-          slides.setContainer(slideElement);
-
-          slides.transitionToSlide(0);
-      });
-
-
-      tick();
-      function tick () {
-          space.tick();
-          if (space.shouldRedraw) {
-              spaceDraw.draw();
-          }
-          space.clearFlags();
-
-          slides && slides.tick();
-
-          requestAnimationFrame(tick);
-      }
-
+      mainView = new MainView(document);
+      mainView.start();
     </script>
   </body>
 </html>

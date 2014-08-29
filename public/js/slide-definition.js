@@ -25,8 +25,9 @@ function SlideDefinition () {
 
     // Pair this executable definition with a DOM element while the
     // slide is active.
-    proto.bind = function (element) {
+    proto.bind = function (element, slideElements) {
         this.element = element;
+        this.slideElements = slideElements
         this.isBound = true;
         this.element.setAttribute('class', 'slide');
         this.createMainContent();
@@ -38,6 +39,7 @@ function SlideDefinition () {
 
     proto.setTransition = function (percent) {
         var opacity;
+
         opacity = percent.toFixed(20);
         if (opacity) {
             this.element.setAttribute('style', 'opacity: ' + opacity);
